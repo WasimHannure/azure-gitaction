@@ -1,8 +1,7 @@
 name: Apply terraform resources
 
 on:
-  push:
-    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   deploy:
