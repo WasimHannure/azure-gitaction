@@ -7,4 +7,3 @@ variable "storage_account" {
   default     = "professorstorageacct2026"
   
 }
-
