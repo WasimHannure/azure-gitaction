@@ -1,0 +1,49 @@
+pipeline {
+    agent any
+    environment {
+        ARM_CLIENT_ID       = credentials('azure-client-id')
+        ARM_CLIENT_SECRET   = credentials('azure-client-secret')
+        ARM_TENANT_ID       = credentials('azure-tenant-id')
+        ARM_SUBSCRIPTION_ID = credentials('azure-subscription-id')
+    }
+
+    stages {
+        stage('Git checkout stage') {
+            steps {
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/WasimHannure/az-githubaction']])
+            }
+        }
+       
+	    stage('Terraform Init') {
+            steps {
+                sh '''
+                  terraform init
+                '''
+            }
+        }
+
+        stage('Terraform Plan') {
+            steps {
+                sh '''
+                  terraform plan
+                '''
+            }
+        }
+
+        stage('Terraform Apply') {
+            steps {
+                sh '''
+                  terraform apply -auto-approve
+                '''
+            }
+        }
+        stage('Terraform destroy') {
+            steps {
+		input(message: "⚠️ Do you really want to destroy all resources?", ok: "Destroy")
+                sh '''
+                  terraform destroy -auto-approve
+                '''
+            }
+        }
+    }
+}
